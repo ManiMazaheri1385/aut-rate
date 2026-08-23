@@ -220,6 +220,8 @@ function LoginFlow() {
               />
               {emailError && <p className="text-xs text-destructive">{emailError}</p>}
             </div>
+            {/* Clerk bot-protection widget mounts here (Smart CAPTCHA) */}
+            <div id="clerk-captcha" data-cl-theme="light" data-cl-size="flexible" />
             <Button type="submit" className="w-full" disabled={sending}>
               {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               {t("auth.sendCode")}
