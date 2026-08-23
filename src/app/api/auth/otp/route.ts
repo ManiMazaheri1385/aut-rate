@@ -63,13 +63,17 @@ export async function POST(request: Request) {
     const sent = await sendOtpEmail(email, code);
 
     // Create the account on first request so authorize() can find it.
+    // An email listed in ADMIN_ENV var ADMIN_EMAIL is always granted ADMIN.
+    const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase().trim();
+    const isAdminEmail = Boolean(adminEmail && email === adminEmail);
+
     await db.user.upsert({
       where: { email },
-      update: {},
+      update: isAdminEmail ? { role: "ADMIN" } : {},
       create: {
         email,
         name: email.split("@")[0],
-        role: existing?.role ?? "STUDENT",
+        role: isAdminEmail || existing?.role === "ADMIN" ? "ADMIN" : "STUDENT",
       },
     });
 
