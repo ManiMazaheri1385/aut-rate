@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import type { ReactNode } from "react";
-import { BookOpen, Eye, HeartHandshake, ThumbsUp } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ReviewCard } from "@/components/reviews/review-card";
 import { DashboardTabs, StudentIdForm } from "@/components/dashboard/dashboard-tabs";
@@ -41,7 +39,7 @@ export default async function DashboardPage() {
     if (!professor) {
       return (
         <div className="container py-10">
-          <p className="rounded-lg bg-card p-8 text-center text-sm shadow">
+          <p className="rounded-lg bg-card p-8 text-center text-sm">
             پروفایل استاد برای حساب شما ساخته نشده است. با مدیر سامانه تماس بگیرید.
           </p>
         </div>
@@ -121,7 +119,7 @@ export default async function DashboardPage() {
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-extrabold">
+            <h1 className="font-display text-4xl font-bold sm:text-5xl">
               {t("dashboard.welcome")}، {user.name}
             </h1>
             <Badge variant="accent" className="mt-2">{t("dashboard.professorPanel")}</Badge>
@@ -133,10 +131,10 @@ export default async function DashboardPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <StatCard icon={<Eye className="h-5 w-5" />} label={t("professor.totalReviews")} value={formatNumberFa(agg?.totalReviews ?? 0)} />
-          <StatCard icon={<ThumbsUp className="h-5 w-5" />} label={t("professor.avgRating")} value={formatNumberFa(agg?.avgRating ?? 0, 1)} />
-          <StatCard icon={<BookOpen className="h-5 w-5" />} label={t("professor.avgDifficulty")} value={formatNumberFa(agg?.avgDifficulty ?? 0, 1)} />
-          <StatCard icon={<HeartHandshake className="h-5 w-5" />} label={t("professor.takeAgainRate")} value={`${formatNumberFa(takeAgainPercent)}٪`} />
+          <StatCard label={t("professor.totalReviews")} value={formatNumberFa(agg?.totalReviews ?? 0)} />
+          <StatCard label={t("professor.avgRating")} value={formatNumberFa(agg?.avgRating ?? 0, 1)} />
+          <StatCard label={t("professor.avgDifficulty")} value={formatNumberFa(agg?.avgDifficulty ?? 0, 1)} />
+          <StatCard label={t("professor.takeAgainRate")} value={`${formatNumberFa(takeAgainPercent)}٪`} />
         </div>
 
         {/* Analytics */}
@@ -165,7 +163,7 @@ export default async function DashboardPage() {
         <section className="space-y-4">
           <h2 className="text-xl font-bold">{t("dashboard.myReviewsHeader")}</h2>
           {received.length === 0 ? (
-            <p className="rounded-lg bg-card px-4 py-8 text-center text-sm text-muted-foreground shadow-sm">
+            <p className="rounded-lg bg-card px-4 py-8 text-center text-sm text-muted-foreground">
               {t("professor.noReviews")}
             </p>
           ) : (
@@ -226,7 +224,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="container space-y-8 py-10">
-      <h1 className="text-2xl font-extrabold">
+      <h1 className="font-display text-4xl font-bold sm:text-5xl">
         {t("dashboard.welcome")}، {user.name}
       </h1>
 
@@ -243,9 +241,9 @@ export default async function DashboardPage() {
       <section className="space-y-4">
         <h2 className="text-xl font-bold">{t("dashboard.tabActivity")}</h2>
         <div className="grid grid-cols-3 gap-4">
-          <StatCard icon={<BookOpen className="h-5 w-5" />} label={t("dashboard.statReviewsGiven")} value={formatNumberFa(myReviews.length)} />
-          <StatCard icon={<HeartHandshake className="h-5 w-5" />} label={t("dashboard.statLikesReceived")} value={formatNumberFa(likesReceived)} />
-          <StatCard icon={<ThumbsUp className="h-5 w-5" />} label={t("dashboard.statLikesGiven")} value={formatNumberFa(likesGiven)} />
+          <StatCard label={t("dashboard.statReviewsGiven")} value={formatNumberFa(myReviews.length)} />
+          <StatCard label={t("dashboard.statLikesReceived")} value={formatNumberFa(likesReceived)} />
+          <StatCard label={t("dashboard.statLikesGiven")} value={formatNumberFa(likesGiven)} />
         </div>
       </section>
 
@@ -259,16 +257,11 @@ export default async function DashboardPage() {
   );
 }
 
-function StatCard({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
+function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-primary">{icon}</span>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <CardTitle className="text-xl font-extrabold text-primary">{value}</CardTitle>
-        <p className="mt-1 text-xs text-muted-foreground">{label}</p>
-      </CardContent>
-    </Card>
+    <div className="flex flex-col gap-1 rounded-lg border bg-card px-4 py-3.5">
+      <span className="font-display text-2xl font-bold leading-none text-primary">{value}</span>
+      <span className="mt-1 text-xs text-muted-foreground">{label}</span>
+    </div>
   );
 }

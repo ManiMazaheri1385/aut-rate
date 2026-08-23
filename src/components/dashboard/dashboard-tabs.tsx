@@ -92,7 +92,7 @@ export function DashboardTabs({ myReviews, likedReviews, favorites, viewer }: Da
             {favorites.map((fav) => (
               <li key={fav.id}>
                 <Link href={`/professors/${fav.id}`}>
-                  <Card className="transition-all hover:-translate-y-0.5 hover:shadow-md">
+                  <Card className="transition-colors hover:border-input">
                     <CardContent className="flex items-center justify-between p-4">
                       <span className="text-sm font-bold">{fav.name}</span>
                       <Badge variant="accent">{departmentLabel(fav.department)}</Badge>
@@ -108,9 +108,7 @@ export function DashboardTabs({ myReviews, likedReviews, favorites, viewer }: Da
 }
 
 function EmptyState({ text }: { text: string }) {
-  return (
-    <p className="rounded-lg bg-card px-4 py-10 text-center text-sm text-muted-foreground shadow-sm">{text}</p>
-  );
+  return <p className="rounded-lg bg-card px-4 py-10 text-center text-sm text-muted-foreground">{text}</p>;
 }
 
 /** Inline student ID form shown when the student has not registered one yet. */

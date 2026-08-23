@@ -4,23 +4,28 @@
 
 @layer base {
   :root {
-    --background: 0 0% 96%; /* #F5F5F5 complementary gray */
-    --foreground: 240 10% 12%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 12%;
-    --primary: 349 71% 36%; /* AUT Crimson #9E1B32 */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 90%;
-    --secondary-foreground: 240 6% 20%;
-    --muted: 0 0% 92%;
-    --muted-foreground: 240 4% 42%;
-    --accent: 349 60% 95%;
-    --accent-foreground: 349 71% 30%;
-    --destructive: 0 72% 45%;
+    /* Turquoise tile & dew: mint-washed paper under deep ocean ink. */
+    --background: 172 32% 97%;
+    --foreground: 197 42% 10%;
+    --card: 180 40% 99%;
+    --card-foreground: 197 42% 10%;
+    /* Deep petrol — the interactive ink of the brand */
+    --primary: 190 95% 27%;
+    --primary-foreground: 172 45% 98%;
+    --secondary: 175 24% 93%;
+    --secondary-foreground: 197 25% 22%;
+    --muted: 175 18% 92%;
+    --muted-foreground: 197 12% 40%;
+    --accent: 172 58% 93%;
+    --accent-foreground: 190 92% 22%;
+    --destructive: 0 72% 42%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 87%;
-    --input: 0 0% 84%;
-    --ring: 349 71% 36%;
+    --border: 178 24% 87%;
+    --input: 178 22% 82%;
+    --ring: 190 95% 30%;
+    /* Abyss floor for the footer and deep bands */
+    --floor: 199 68% 7%;
+    --gold: 40 58% 50%;
     --radius: 0.625rem;
   }
 
@@ -35,6 +40,39 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
     text-rendering: optimizeLegibility;
+  }
+
+  /* Premium film grain on the substrate only: felt, not seen, never over content. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  h1,
+  h2,
+  .font-display {
+    font-family: var(--font-display);
+  }
+}
+
+@layer utilities {
+  .bg-floor {
+    background-color: hsl(var(--floor));
+  }
+
+  /* The signature atmosphere: deep ocean resolving into turquoise tile,
+     lit from one direction. Used full-bleed on the hero band. */
+  .bg-ocean {
+    background-color: #073b4c;
+    background-image:
+      radial-gradient(120% 150% at 88% -12%, rgba(45, 212, 191, 0.38), transparent 52%),
+      radial-gradient(80% 90% at 8% 112%, rgba(8, 51, 68, 0.9), transparent 55%),
+      linear-gradient(158deg, #062f3f 0%, #0a4a57 38%, #0e7268 74%, #14947f 100%);
   }
 }
 
@@ -51,7 +89,7 @@
   background: transparent;
 }
 
-/* Range slider styled with the AUT crimson accent */
+/* Range slider styled with the petrol accent */
 input[type="range"] {
   accent-color: hsl(var(--primary));
 }

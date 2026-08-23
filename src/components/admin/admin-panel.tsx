@@ -41,7 +41,7 @@ export function AdminPanel({ adminName }: { adminName: string }) {
   return (
     <div className="container space-y-6 py-10">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-extrabold">{t("admin.title")}</h1>
+        <h1 className="font-display text-4xl font-bold sm:text-5xl">{t("admin.title")}</h1>
         <Badge variant="accent">
           <ShieldCheck className="ml-1 h-3.5 w-3.5" />
           {adminName}
@@ -211,7 +211,7 @@ function ReviewsSection() {
                 </div>
                 <p className="line-clamp-2 text-sm leading-6">{review.comment}</p>
                 <p className="text-[11px] text-muted-foreground">
-                  ⭐ {formatNumberFa(review.rating)} · {formatJalaliDate(review.createdAt)}
+                  {formatNumberFa(review.rating)} · {formatJalaliDate(review.createdAt)}
                 </p>
               </div>
               <Button size="sm" variant="destructive" onClick={() => setDeleteTarget(review)}>

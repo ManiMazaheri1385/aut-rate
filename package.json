@@ -15,6 +15,8 @@
     "db:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@clerk/localizations": "^4.15.5",
+    "@clerk/nextjs": "^6.39.6",
     "@hookform/resolvers": "^3.9.0",
     "@prisma/client": "^5.22.0",
     "@radix-ui/react-avatar": "^1.1.1",
@@ -26,8 +28,6 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.454.0",
     "next": "14.2.32",
-    "next-auth": "^4.24.11",
-    "nodemailer": "^7.0.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.53.1",
@@ -39,7 +39,6 @@
   },
   "devDependencies": {
     "@types/node": "^20.17.6",
-    "@types/nodemailer": "^7.0.12",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "autoprefixer": "^10.4.20",
@@ -61,6 +60,7 @@
     "@prisma/engines@5.22.0": true,
     "esbuild@0.28.2": true,
     "prisma@5.22.0": true,
-    "unrs-resolver@1.12.2": true
+    "unrs-resolver@1.12.2": true,
+    "@clerk/shared@3.47.8": true
   }
 }

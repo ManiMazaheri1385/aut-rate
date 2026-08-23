@@ -60,7 +60,7 @@ export function ProfessorReviewsSection({
           {isLoading ? (
             <p className="text-sm text-muted-foreground">{t("common.loading")}</p>
           ) : reviews.length === 0 ? (
-            <p className="rounded-md bg-card px-4 py-8 text-center text-sm text-muted-foreground shadow-sm">
+            <p className="rounded-md bg-card px-4 py-8 text-center text-sm text-muted-foreground">
               {t("professor.noReviews")}
             </p>
           ) : (

@@ -46,6 +46,7 @@ enum ReportStatus {
 
 model User {
   id            String    @id @default(cuid())
+  clerkId       String?   @unique // linked Clerk account (claimed on first matching-email login)
   name          String
   email         String    @unique // must end with @aut.ac.ir (enforced in app layer)
   studentId     String? // 9 digits, optional for professors
@@ -62,19 +63,6 @@ model User {
   reports   Report[]
 
   @@index([role])
-}
-
-// One-time verification codes for email OTP login.
-model OtpCode {
-  id        String   @id @default(cuid())
-  email     String
-  codeHash  String
-  expiresAt DateTime
-  consumed  Boolean  @default(false)
-  attempts  Int      @default(0)
-  createdAt DateTime @default(now())
-
-  @@index([email, consumed, expiresAt])
 }
 
 model Professor {

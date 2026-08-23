@@ -96,7 +96,7 @@ export function ReviewCard({ review, viewer, showCourse = false, onChanged }: Re
     : (review.author?.name ?? t("review.anonymousName"));
 
   return (
-    <Card className="transition-shadow hover:shadow-md">
+    <Card className="transition-colors hover:border-input">
       <CardContent className="p-5">
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -189,7 +189,7 @@ export function ReviewCard({ review, viewer, showCourse = false, onChanged }: Re
           </div>
           <div className="rounded-md bg-secondary/60 px-3 py-2">
             <p className="text-[11px] text-muted-foreground">{t("review.wouldTakeAgain")}</p>
-            <p className={`text-sm font-bold ${review.wouldTakeAgain ? "text-green-700" : "text-destructive"}`}>
+            <p className={`text-sm font-bold ${review.wouldTakeAgain ? "text-primary" : "text-destructive"}`}>
               {review.wouldTakeAgain ? `✓ ${t("common.yes")}` : `✗ ${t("common.no")}`}
             </p>
           </div>
@@ -350,7 +350,7 @@ function EditReviewDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{t("common.edit")} — نظر</DialogTitle>
+          <DialogTitle>{t("common.edit")} نظر</DialogTitle>
         </DialogHeader>
         <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="space-y-2">

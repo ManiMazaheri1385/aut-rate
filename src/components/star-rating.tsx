@@ -51,7 +51,7 @@ export function StarRating({ value, onChange, size = "md", showValue = false, cl
           style={{ width: `${fillPercent}%` }}
         >
           {[0, 1, 2, 3, 4].map((i) => (
-            <Star key={i} className={cn(sizeClass, "shrink-0 fill-primary text-primary")} />
+            <Star key={i} className={cn(sizeClass, "shrink-0 fill-[hsl(var(--gold))] text-[hsl(var(--gold))]")} />
           ))}
         </span>
         {/* Base row / buttons */}
@@ -66,7 +66,7 @@ export function StarRating({ value, onChange, size = "md", showValue = false, cl
                 onMouseEnter={() => setHoverValue(i + 1)}
                 onClick={(e) => handleStarClick(i, e)}
               >
-                <Star className={cn(sizeClass, "text-muted-foreground/40 transition-colors hover:text-primary/60")} />
+                <Star className={cn(sizeClass, "text-muted-foreground/40 transition-colors hover:text-[hsl(var(--gold))]/70")} />
               </button>
             ) : (
               <Star key={i} className={cn(sizeClass, "text-muted-foreground/40")} />

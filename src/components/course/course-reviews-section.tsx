@@ -30,7 +30,7 @@ export function CourseReviewsSection({ courseId }: { courseId: string }) {
       {isLoading || !viewerLoaded ? (
         <p className="text-sm text-muted-foreground">{t("common.loading")}</p>
       ) : !data || data.items.length === 0 ? (
-        <p className="rounded-lg bg-card px-4 py-8 text-center text-sm text-muted-foreground shadow-sm">
+        <p className="rounded-lg bg-card px-4 py-8 text-center text-sm text-muted-foreground">
           {t("courses.noReviews")}
         </p>
       ) : (

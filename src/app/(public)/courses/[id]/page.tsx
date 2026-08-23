@@ -54,9 +54,9 @@ export default async function CourseDetailPage({ params }: PageProps) {
     <div className="container space-y-8 py-10">
       {/* Course info */}
       <section className="space-y-4">
-        <div className="flex items-center gap-2">
-          <BookOpen className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-extrabold">{course.name}</h1>
+        <div className="flex flex-wrap items-center gap-3">
+          <BookOpen className="h-6 w-6 shrink-0 text-primary" />
+          <h1 className="font-display text-4xl font-bold sm:text-5xl">{course.name}</h1>
           <Badge dir="ltr" variant="outline">
             {course.code}
           </Badge>
@@ -97,12 +97,14 @@ export default async function CourseDetailPage({ params }: PageProps) {
               .filter((p) => p.id !== course.professorId)
               .slice(0, 4)
               .map((professor) => (
-                <Link key={professor.id} href={`/professors/${professor.id}`}>
-                  <Card className="transition-all hover:-translate-y-0.5 hover:shadow-md">
+                <Link key={professor.id} href={`/professors/${professor.id}`} className="group">
+                  <Card className="transition-colors group-hover:border-input">
                     <CardContent className="flex items-center justify-between p-4">
-                      <span className="text-sm font-bold">{professor.name}</span>
+                      <span className="text-sm font-bold transition-colors group-hover:text-primary">
+                        {professor.name}
+                      </span>
                       <span dir="rtl" className="text-xs text-muted-foreground">
-                        ⭐ {formatNumberFa(professor.totalReviews)}
+                        {formatNumberFa(professor.totalReviews)} نظر
                       </span>
                     </CardContent>
                   </Card>

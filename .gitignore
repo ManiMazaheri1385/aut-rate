@@ -18,3 +18,5 @@ public/uploads/*
 *.tsbuildinfo
 next-env.d.ts
 .DS_Store
+
+dev*.log

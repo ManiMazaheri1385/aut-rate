@@ -94,7 +94,7 @@ export function SearchBar({ placeholder, className }: { placeholder?: string; cl
       </div>
 
       {open && (
-        <div className="absolute inset-x-0 top-full z-40 mt-2 overflow-hidden rounded-md border bg-card shadow-lg">
+        <div className="absolute inset-x-0 top-full z-40 mt-2 overflow-hidden rounded-md border bg-card [box-shadow:0_10px_28px_-14px_rgba(3,31,41,0.4)]">
           {loading ? (
             <div className="space-y-2 p-3">
               <Skeleton className="h-4 w-3/4" />

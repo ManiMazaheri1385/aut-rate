@@ -123,15 +123,13 @@ export default async function ProfessorDetailPage({ params }: PageProps) {
         </CardContent>
       </Card>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      {/* Stats ledger */}
+      <div className="flex flex-wrap items-baseline justify-center gap-x-12 gap-y-3 rounded-lg border bg-card py-5">
         {stats.map((stat) => (
-          <Card key={stat.label}>
-            <CardContent className="p-4 text-center">
-              <p className="text-lg font-extrabold text-primary">{stat.value}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{stat.label}</p>
-            </CardContent>
-          </Card>
+          <div key={stat.label} className="flex items-baseline gap-2.5">
+            <span className="font-display text-2xl font-bold text-primary">{stat.value}</span>
+            <span className="text-xs text-muted-foreground">{stat.label}</span>
+          </div>
         ))}
       </div>
 
@@ -151,23 +149,25 @@ export default async function ProfessorDetailPage({ params }: PageProps) {
           <h2 className="text-xl font-bold">{t("professor.coursesTaught")}</h2>
         </div>
         {courses.length === 0 ? (
-          <p className="rounded-lg bg-card px-4 py-8 text-center text-sm text-muted-foreground shadow-sm">
+          <p className="rounded-lg bg-card px-4 py-8 text-center text-sm text-muted-foreground">
             {t("professor.noCourses")}
           </p>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {courses.map((course) => (
-              <Link key={course.id} href={`/courses/${course.id}`}>
-                <Card className="transition-all hover:-translate-y-0.5 hover:shadow-md">
+              <Link key={course.id} href={`/courses/${course.id}`} className="group">
+                <Card className="h-full transition-colors group-hover:border-input">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-bold">{course.name}</CardTitle>
+                    <CardTitle className="text-sm font-bold transition-colors group-hover:text-primary">
+                      {course.name}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-1 pb-4 text-xs text-muted-foreground">
                     <p dir="ltr" className="text-left font-medium text-primary">
                       {course.code}
                     </p>
                     <p>
-                      {t("courses.credits")}: {formatNumberFa(course.credits)} — {t("courses.semester")}:{" "}
+                      {t("courses.credits")}: {formatNumberFa(course.credits)} · {t("courses.semester")}:{" "}
                       {course.semester}
                     </p>
                   </CardContent>

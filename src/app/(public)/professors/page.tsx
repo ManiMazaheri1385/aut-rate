@@ -29,11 +29,11 @@ export default async function ProfessorsPage({ searchParams }: PageProps) {
 
   return (
     <div className="container py-10">
-      <div className="mb-8 space-y-4">
-        <h1 className="text-2xl font-extrabold">{t("professors.title")}</h1>
+      <div className="mb-8 flex flex-wrap items-baseline justify-between gap-3">
+        <h1 className="font-display text-4xl font-bold sm:text-5xl">{t("professors.title")}</h1>
         <p className="text-sm text-muted-foreground">
           {formatNumberFa(result.total)} {t("professors.countSuffix")}
-          {q ? ` — «${q}»` : ""}
+          {q ? ` «${q}»` : ""}
         </p>
       </div>
 
@@ -41,7 +41,7 @@ export default async function ProfessorsPage({ searchParams }: PageProps) {
 
       <div className="mt-8">
         {result.items.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 rounded-lg bg-card py-16 text-center shadow-sm">
+          <div className="flex flex-col items-center gap-3 rounded-lg bg-card py-16 text-center">
             <SearchX className="h-10 w-10 text-muted-foreground/50" />
             <p className="text-sm text-muted-foreground">{t("professors.empty")}</p>
           </div>

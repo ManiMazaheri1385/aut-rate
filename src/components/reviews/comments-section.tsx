@@ -68,7 +68,7 @@ export function CommentsSection({ reviewId }: { reviewId: string }) {
                 {c.author.image ? <AvatarImage src={c.author.image} alt="" /> : null}
                 <AvatarFallback className="text-[10px]">{nameInitials(c.author.name ?? "")}</AvatarFallback>
               </Avatar>
-              <div className="min-w-0 flex-1 rounded-md bg-card px-3 py-2 text-sm shadow-sm">
+              <div className="min-w-0 flex-1 rounded-md border bg-card px-3 py-2 text-sm">
                 <span className="font-medium">{c.author.name}</span>{" "}
                 <span className="text-[11px] text-muted-foreground">{timeAgoFa(c.createdAt)}</span>
                 <p className="whitespace-pre-line text-sm">{c.content}</p>

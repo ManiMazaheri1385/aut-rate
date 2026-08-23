@@ -3,8 +3,10 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
-import { GraduationCap, LayoutDashboard, ShieldCheck, LogOut, UserRound } from "lucide-react";
+import { useAuth, useClerk, useUser } from "@clerk/nextjs";
+import { useQuery } from "@tanstack/react-query";
+import { LayoutDashboard, ShieldCheck, LogOut, UserRound } from "lucide-react";
+import { Seal } from "@/components/seal";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -15,14 +17,31 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SearchBar } from "@/components/search-bar";
+import { isClerkConfigured } from "@/lib/clerk-config";
 import { t } from "@/lib/i18n";
 import { nameInitials } from "@/lib/utils";
 
+/** Minimal shape returned by GET /api/me. */
+interface MeResponse {
+  success: boolean;
+  data: null | {
+    id: string;
+    name: string;
+    email: string;
+    role: "STUDENT" | "PROFESSOR" | "ADMIN";
+    studentId: string | null;
+    image: string | null;
+    suspended: boolean;
+  };
+}
+
 export function Navbar() {
+  // Without Clerk keys the site stays fully browsable as a public catalog.
+  return isClerkConfigured ? <NavbarWithAuth /> : <NavbarShell signedInArea={null} />;
+}
+
+function NavbarShell({ signedInArea }: { signedInArea: React.ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const { data: session, status } = useSession();
-  const user = session?.user;
 
   const links = [
     { href: "/", label: t("nav.home") },
@@ -33,14 +52,12 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
       <div className="container flex h-16 items-center gap-4">
-        {/* Brand */}
-        <Link href="/" className="flex shrink-0 items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <GraduationCap className="h-5 w-5" />
-          </span>
-          <span className="hidden flex-col leading-tight sm:flex">
-            <span className="text-sm font-bold">{t("common.appName")}</span>
-            <span className="text-[11px] text-muted-foreground">{t("common.faculty")}</span>
+        {/* Brand: the bare registry mark, no tile behind it */}
+        <Link href="/" className="flex shrink-0 items-center gap-2.5">
+          <Seal size={38} className="hidden sm:block" />
+          <span className="flex flex-col leading-tight">
+            <span className="font-display text-lg font-bold">{t("common.appName")}</span>
+            <span className="text-[10px] text-muted-foreground">{t("common.faculty")}</span>
           </span>
         </Link>
 
@@ -65,59 +82,7 @@ export function Navbar() {
         </div>
 
         {/* Session actions */}
-        <div className="ms-auto flex items-center gap-2">
-          {status === "loading" ? (
-            <div className="h-9 w-9 animate-pulse rounded-full bg-secondary" />
-          ) : user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button aria-label={user.name ?? ""} className="rounded-full outline-none ring-primary focus-visible:ring-2">
-                  <Avatar className="h-9 w-9 border">
-                    {user.image ? <AvatarImage src={user.image} alt={user.name ?? ""} /> : null}
-                    <AvatarFallback>{nameInitials(user.name ?? "")}</AvatarFallback>
-                  </Avatar>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-52">
-                <div className="px-3 py-2">
-                  <p className="text-sm font-medium">{user.name}</p>
-                  <p dir="ltr" className="truncate text-xs text-muted-foreground">{user.email}</p>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => router.push("/dashboard")}>
-                  <LayoutDashboard className="h-4 w-4" />
-                  {t("nav.dashboard")}
-                </DropdownMenuItem>
-                {user.role === "PROFESSOR" && (
-                  <DropdownMenuItem onClick={() => router.push("/dashboard?tab=professor")}>
-                    <UserRound className="h-4 w-4" />
-                    {t("professor.profile")}
-                  </DropdownMenuItem>
-                )}
-                {user.role === "ADMIN" && (
-                  <DropdownMenuItem onClick={() => router.push("/admin")}>
-                    <ShieldCheck className="h-4 w-4" />
-                    {t("nav.admin")}
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="text-destructive focus:text-destructive"
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                >
-                  <LogOut className="h-4 w-4" />
-                  {t("nav.logout")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <>
-              <Button size="sm" onClick={() => router.push("/login")}>
-                {t("nav.login")}
-              </Button>
-            </>
-          )}
-        </div>
+        <div className="ms-auto flex items-center gap-2">{signedInArea}</div>
       </div>
 
       {/* Mobile search */}
@@ -126,4 +91,86 @@ export function Navbar() {
       </div>
     </header>
   );
+}
+
+function NavbarWithAuth() {
+  const router = useRouter();
+  const { isSignedIn, isLoaded } = useAuth();
+  const { user } = useUser();
+  const clerk = useClerk();
+
+  // Role lives in our own database; fetch it only while signed in.
+  const { data: me } = useQuery({
+    queryKey: ["me"],
+    enabled: isSignedIn === true,
+    staleTime: 60_000,
+    queryFn: async (): Promise<MeResponse["data"]> => {
+      try {
+        const res = await fetch("/api/me");
+        const json = (await res.json()) as MeResponse;
+        return json.data ?? null;
+      } catch {
+        return null;
+      }
+    },
+  });
+
+  const displayName = me?.name ?? user?.fullName ?? user?.firstName ?? "";
+  const email = me?.email ?? user?.primaryEmailAddress?.emailAddress ?? "";
+  const imageUrl = me?.image ?? user?.imageUrl ?? "";
+  const role = me?.role;
+
+  const signedInArea = !isLoaded ? (
+    <div className="h-9 w-9 animate-pulse rounded-full bg-secondary" />
+  ) : isSignedIn ? (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button aria-label={displayName} className="rounded-full outline-none ring-primary focus-visible:ring-2">
+          <Avatar className="h-9 w-9 border">
+            {imageUrl ? <AvatarImage src={imageUrl} alt={displayName} /> : null}
+            <AvatarFallback>{nameInitials(displayName)}</AvatarFallback>
+          </Avatar>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-52">
+        <div className="px-3 py-2">
+          <p className="text-sm font-medium">{displayName}</p>
+          <p dir="ltr" className="truncate text-xs text-muted-foreground">
+            {email}
+          </p>
+        </div>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => router.push("/dashboard")}>
+          <LayoutDashboard className="h-4 w-4" />
+          {t("nav.dashboard")}
+        </DropdownMenuItem>
+        {role === "PROFESSOR" && (
+          <DropdownMenuItem onClick={() => router.push("/dashboard?tab=professor")}>
+            <UserRound className="h-4 w-4" />
+            {t("professor.profile")}
+          </DropdownMenuItem>
+        )}
+        {role === "ADMIN" && (
+          <DropdownMenuItem onClick={() => router.push("/admin")}>
+            <ShieldCheck className="h-4 w-4" />
+            {t("nav.admin")}
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="text-destructive focus:text-destructive"
+          onClick={() => void clerk.signOut({ redirectUrl: "/" })}
+        >
+          <LogOut className="h-4 w-4" />
+          {t("nav.logout")}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  ) : (
+    <Button size="sm" onClick={() => router.push("/login")}>
+      {t("nav.login")}
+    </Button>
+  );
+
+  return <NavbarShell signedInArea={signedInArea} />;
 }

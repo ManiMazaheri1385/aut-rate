@@ -1,11 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { SessionProvider } from "next-auth/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 
-/** Global client providers: session, react-query, toasts. */
+/** Global client providers: react-query, toasts. ClerkProvider wraps this in the root layout. */
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = React.useState(
     () =>
@@ -17,11 +16,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <SessionProvider>
-      <QueryClientProvider client={queryClient}>
-        {children}
-        <Toaster dir="rtl" position="top-center" richColors closeButton />
-      </QueryClientProvider>
-    </SessionProvider>
+    <QueryClientProvider client={queryClient}>
+      {children}
+      <Toaster dir="rtl" position="top-center" richColors closeButton />
+    </QueryClientProvider>
   );
 }
