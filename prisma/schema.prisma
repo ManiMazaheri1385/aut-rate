@@ -1,0 +1,209 @@
+// Prisma schema for the AUT professor rating & review system.
+// Code identifiers are English; seeded content is Persian.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum Role {
+  STUDENT
+  PROFESSOR
+  ADMIN
+}
+
+enum Department {
+  MATH
+  CS
+  STATS
+  OR
+}
+
+enum ReportReason {
+  SPAM
+  OFFENSIVE
+  INACCURATE
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  RESOLVED
+  REJECTED
+}
+
+// ---------------------------------------------------------------------------
+// Models
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique // must end with @aut.ac.ir (enforced in app layer)
+  studentId     String? // 9 digits, optional for professors
+  role          Role      @default(STUDENT)
+  emailVerified DateTime?
+  image         String?
+  suspended     Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+
+  professor Professor?
+  reviews   Review[] @relation("StudentReviews")
+  likes     Like[]
+  comments  Comment[]
+  reports   Report[]
+
+  @@index([role])
+}
+
+// One-time verification codes for email OTP login.
+model OtpCode {
+  id        String   @id @default(cuid())
+  email     String
+  codeHash  String
+  expiresAt DateTime
+  consumed  Boolean  @default(false)
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([email, consumed, expiresAt])
+}
+
+model Professor {
+  id                 String     @id @default(cuid())
+  userId             String     @unique
+  department         Department
+  bio                String     @default("")
+  photoUrl           String?
+  researchInterests  String[]   @default([])
+  personalLink       String?
+  createdAt          DateTime   @default(now())
+
+  user       User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courses    Course[]
+  reviews    Review[]
+  aggregate  ProfessorAggregate?
+
+  @@index([department])
+}
+
+model Course {
+  id          String     @id @default(cuid())
+  code        String // e.g. "MATH-301"
+  name        String // Persian name, e.g. "ریاضی مهندسی"
+  department  Department
+  credits     Int
+  description String     @default("")
+  semester    String // e.g. "پاییز ۱۴۰۴"
+  professorId String?
+  createdAt   DateTime   @default(now())
+
+  professor Professor? @relation(fields: [professorId], references: [id], onDelete: SetNull)
+  reviews   Review[]
+
+  @@unique([code, semester])
+  @@index([department])
+}
+
+model Review {
+  id              String   @id @default(cuid())
+  studentId       String
+  courseId        String
+  professorId     String
+  rating          Int // 1-5
+  difficulty      Int // 1-5
+  wouldTakeAgain  Boolean
+  comment         String // min 20 chars enforced in validation layer
+  anonymous       Boolean  @default(false)
+  helpfulCount    Int      @default(0)
+  reply           String? // official professor reply
+  repliedAt       DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  student   User      @relation("StudentReviews", fields: [studentId], references: [id], onDelete: Cascade)
+  course    Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  professor Professor @relation(fields: [professorId], references: [id], onDelete: Cascade)
+
+  likes    Like[]
+  comments Comment[]
+  reports  Report[]
+
+  @@unique([studentId, courseId, professorId])
+  @@index([professorId, createdAt])
+  @@index([courseId, createdAt])
+  @@index([studentId])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  reviewId  String
+  userId    String
+  createdAt DateTime @default(now())
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([reviewId, userId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  reviewId  String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([reviewId, createdAt])
+}
+
+model Report {
+  id          String        @id @default(cuid())
+  reviewId    String
+  userId      String
+  reason      ReportReason
+  description String        @default("")
+  status      ReportStatus  @default(PENDING)
+  createdAt   DateTime      @default(now())
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+}
+
+// Cache table for professor statistics (kept in sync on every mutation).
+model ProfessorAggregate {
+  id            String   @id @default(cuid())
+  professorId   String   @unique
+  avgRating     Float    @default(0)
+  avgDifficulty Float    @default(0)
+  totalReviews  Int      @default(0)
+  totalLikes    Int      @default(0)
+  updatedAt     DateTime @updatedAt
+
+  professor Professor @relation(fields: [professorId], references: [id], onDelete: Cascade)
+}
+
+// System audit log shown in the admin panel ("لاگ سیستم").
+model SystemLog {
+  id        String   @id @default(cuid())
+  action    String
+  meta      Json?
+  actorId   String?
+  actorName String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
